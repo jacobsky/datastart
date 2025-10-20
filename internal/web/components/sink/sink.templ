@@ -1,0 +1,37 @@
+package sink
+
+import "datastart/internal/web/components"
+
+templ Sink() {
+	@components.Base() {
+		<h1>Datastar Kitchen Sink</h1>
+		<section>
+			<h4>Input some text</h4>
+			<input data-bind="input"/>
+			<h4
+				data-show="$input !=''"
+				style="display:none;"
+			>Echo, Upper, Repeated </h4>
+			<div data-text="$input"></div>
+			<div data-text="$input.toUpperCase()"></div>
+			<div
+				data-computed-repeated="$input.repeat(2)"
+				data-text="$repeated"
+			></div>
+			<button
+				data-show="$input != ''"
+				data-attr-disabled="$input == ''"
+				data-on-click="$input = ''"
+			>
+				Reset
+			</button>
+		</section>
+		<section>
+			<h1>SEE </h1>
+			<div data-signals-data="'...'">
+				<button data-on-click="@get('/sink/testsse')">Request data</button>
+				<div data-text="$data"></div>
+			</div>
+		</section>
+	}
+}

@@ -5,6 +5,7 @@ import (
 
 	"datastart/internal/web"
 	"datastart/internal/web/components/home"
+	"datastart/internal/web/components/sink"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -17,7 +18,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// Register handlers
 	home := home.NewHandler()
 	mux.Handle("/", home)
-
+	sink.AddRoutes(mux)
 	// Wrap the mux with CORS middleware
 	return s.corsMiddleware(mux)
 }
