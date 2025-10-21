@@ -29,8 +29,26 @@ templ Sink() {
 		<section>
 			<h1>SEE </h1>
 			<div data-signals-data="'...'">
-				<button data-on-click="@get('/sink/testsse')">Request data</button>
+				<button
+					id="requestdata"
+					data-on-click="@get('/sink/testsse')"
+					data-indicator-fetching
+					data-attr="{'aria-busy': $fetching}"
+					aria-busy="true"
+					aria-label="Handling requests"
+				>
+					Request data
+				</button>
 				<div data-text="$data"></div>
+			</div>
+		</section>
+		<section>
+			<h1>Complex Data </h1>
+			<div data-signals-complex="{ isPressed: { client: false, server: false }}">
+				<button data-on-click="$complex.isPressed.client = !$complex.isPressed.client">Request data</button>
+				<button data-on-click="@get('/sink/complexsee')">Request data</button>
+				<div data-text="$complex.isPressed.client"></div>
+				<div data-text="$complex.isPressed.server"></div>
 			</div>
 		</section>
 	}

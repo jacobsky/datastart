@@ -1,7 +1,9 @@
 package sink
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -15,6 +17,8 @@ func AddRoutes(mux *http.ServeMux) {
 	sink := NewHandler()
 	mux.Handle("/sink", sink)
 	mux.HandleFunc("/sink/testsse", testSee)
+	mux.HandleFunc("/sink/complexsee", complexSee)
+
 }
 
 type Handler struct{}
@@ -32,9 +36,38 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type complexSignal struct {
+	Input    string `json:"input"`
+	Repeated string `json:"repeated"`
+	Data     string `json:"data"`
+	Complex  struct {
+		IsPressed struct {
+			Client bool `json:"client"`
+			Server bool `json:"server"`
+		} `json:"isPressed"`
+	} `json:"complex"`
+}
+
+func complexSee(w http.ResponseWriter, r *http.Request) {
+	see := datastar.NewSSE(w, r)
+	signals := &complexSignal{}
+	if err := datastar.ReadSignals(r, signals); err != nil {
+		log.Printf("%v", err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	signals.Complex.IsPressed.Server = !signals.Complex.IsPressed.Server
+	jsondata, _ := json.Marshal(signals)
+	err := see.PatchSignals([]byte(jsondata))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
 func testSee(w http.ResponseWriter, r *http.Request) {
 	see := datastar.NewSSE(w, r)
 	event_format := `{'data': 'this is event #%v'}`
+	time.Sleep(5 * time.Second)
 	for i := range 10 {
 
 		event := fmt.Sprintf(event_format, i+1)
