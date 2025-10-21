@@ -2,11 +2,25 @@ package home
 
 import "datastart/internal/web/components"
 
+templ CharacterBlock(val string, x, y int) {
+	<text fill="#ffffff" font-size="10" font-family="Consolas" x={ x } data-attr-y="$ypos">
+		{ val }
+	</text>
+}
+
 templ Home() {
 	@components.Base() {
-		<p>Here is some content </p>
-		<button data-on-click="alert('I’m sorry, Dave. I’m afraid I can’t do that.')">
-			Open the pod bay doors, HAL.
-		</button>
+		<h1>Experiment #1</h1>
+		// Controls
+		<section
+			data-signals="{xvel:0, yvelocity:40, xpos:0, ypos:0}"
+			data-on-interval__duration.100ms="$ypos = (($ypos + $yvelocity) % 500)"
+			data-on-interval__duration.200ms="$yvelocity++"
+		>
+			<svg height="500" width="500">
+				@CharacterBlock("@", 50, 0)
+				Sorry your browser does not support inline SVG which is required for this site.
+			</svg>
+		</section>
 	}
 }
