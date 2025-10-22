@@ -1,9 +1,27 @@
 package home
 
-import "datastart/internal/web/components"
+import (
+	"datastart/internal/web/components"
+	"fmt"
+)
 
-templ CharacterBlock(val string, x, y int) {
-	<text fill="#ffffff" font-size="10" font-family="Consolas" x={ x } data-attr-y="$ypos">
+templ CharacterBlock(id, val string, size, x, y, xvel, yvel int) {
+	{{
+// Define the signals for this block
+ypos := fmt.Sprintf("%vypos", id)
+xpos := fmt.Sprintf("%vxpos", id)
+	}}
+	<text
+		id={ id }
+		data-signals={ fmt.Sprintf("{xvel:%v, yvel:%v, %v:%v, %v:%v}", xvel, yvel, xpos, x, ypos, y) }
+		data-on-interval__duration.10ms={ fmt.Sprintf("$%v=$%v + $yvel;$%v=$%v + $xvel;", ypos, ypos, xpos, xpos) }
+		data-on-interval__duration.10s={ fmt.Sprintf("@delete('/words/%v')", id) }
+		fill="#ffffff"
+		font-size={ size }
+		font-family="Consolas"
+		data-attr-x={ fmt.Sprintf("$%v", xpos) }
+		data-attr-y={ fmt.Sprintf("$%v", ypos) }
+	>
 		{ val }
 	</text>
 }
@@ -12,13 +30,8 @@ templ Home() {
 	@components.Base() {
 		<h1>Experiment #1</h1>
 		// Controls
-		<section
-			data-signals="{xvel:0, yvelocity:40, xpos:0, ypos:0}"
-			data-on-interval__duration.100ms="$ypos = (($ypos + $yvelocity) % 500)"
-			data-on-interval__duration.200ms="$yvelocity++"
-		>
-			<svg height="500" width="500">
-				@CharacterBlock("@", 50, 0)
+		<section>
+			<svg data-init="@get('/words')" height="500" width="500">
 				Sorry your browser does not support inline SVG which is required for this site.
 			</svg>
 		</section>

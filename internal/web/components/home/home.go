@@ -1,28 +1,21 @@
 package home
 
 import (
-	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/a-h/templ"
 	"github.com/starfederation/datastar-go/datastar"
 )
 
-//	type GameBoard struct {
-//		Width
-//		[Position]string
-//	}
-type CharacterPosition struct {
-	X int `json:"x"`
-	Y int `json:"y"`
+var words = []string{
+	"hello", "world",
 }
 
-var characterPosition = CharacterPosition{0, 0}
-
 func AddRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("PATCH /move", move)
-	mux.HandleFunc("GET /position", position)
+	mux.HandleFunc("GET /words", spawn_words)
+	mux.HandleFunc("DELETE /word/{id}", delete_word)
 	mux.Handle("/", NewHandler())
 }
 
@@ -41,18 +34,21 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func move(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Info {}")
+func spawn_words(w http.ResponseWriter, r *http.Request) {
+	slog.Info("spawn_words")
+	see := datastar.NewSSE(w, r)
+	i := 0
+	for {
+		index := i % len(words)
+
+		err := see.PatchElementTempl(CharacterBlock(strconv.Itoa(i), words[index], 20, 100, 0, 3, 10))
+		if err != nil {
+			slog.Error("Error patching", "error", err.Error())
+		}
+	}
 }
 
-func position(w http.ResponseWriter, r *http.Request) {
-	sse := datastar.NewSSE(w, r)
-	positionjson, err := json.Marshal(characterPosition)
-	if err != nil {
-		log.Printf("json error: %v", err)
-	}
-	err = sse.PatchSignals([]byte(positionjson))
-	if err != nil {
-		log.Printf("json error: %v", err)
-	}
+func delete_word(w http.ResponseWriter, r *http.Request) {
+
+	slog.Info("spawn_words")
 }
