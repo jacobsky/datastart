@@ -16,8 +16,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.Handle("/assets/", fileServer)
 
 	// Register handlers
-	home := home.NewHandler()
-	mux.Handle("/", home)
+	home.AddRoutes(mux)
 	sink.AddRoutes(mux)
 	// Wrap the mux with CORS middleware
 	return s.corsMiddleware(mux)

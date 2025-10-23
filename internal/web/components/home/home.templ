@@ -15,7 +15,6 @@ xpos := fmt.Sprintf("%vxpos", id)
 		id={ id }
 		data-signals={ fmt.Sprintf("{xvel:%v, yvel:%v, %v:%v, %v:%v}", xvel, yvel, xpos, x, ypos, y) }
 		data-on-interval__duration.10ms={ fmt.Sprintf("$%v=$%v + $yvel;$%v=$%v + $xvel;", ypos, ypos, xpos, xpos) }
-		data-on-interval__duration.10s={ fmt.Sprintf("@delete('/words/%v')", id) }
 		fill="#ffffff"
 		font-size={ size }
 		font-family="Consolas"
@@ -26,14 +25,26 @@ xpos := fmt.Sprintf("%vxpos", id)
 	</text>
 }
 
+templ WordRain(words []templ.Component) {
+	<svg id="word_image" height="500" width="1000">
+		for _, block := range words {
+			@block
+		}
+		Sorry your browser does not support inline SVG which is required for this site.
+	</svg>
+}
+
+templ StartWordRain() {
+	<button id="word_image" data-on-click="@get('/words')">Start word rain</button>
+}
+
 templ Home() {
 	@components.Base() {
-		<h1>Experiment #1</h1>
+		<h1>Falling words</h1>
 		// Controls
 		<section>
-			<svg data-init="@get('/words')" height="500" width="500">
-				Sorry your browser does not support inline SVG which is required for this site.
-			</svg>
+			<input data-bind-words placeholder="Add New Word"/>
+			<button id="word_image" data-on-click="@get('/words')">Start word rain</button>
 		</section>
 	}
 }
